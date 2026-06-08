@@ -416,17 +416,9 @@
     }
     .dish-card:hover { transform: translateY(-6px); border-color: var(--gold); box-shadow: 0 24px 68px rgba(212, 175, 55, 0.18); }
 
-    .dish-media { position: relative; min-height: 156px; background: linear-gradient(135deg, var(--cat-a), var(--cat-b)); overflow: hidden; }
+    .dish-media { position: relative; min-height: 156px; background: var(--bg-2); overflow: hidden; }
     .dish-media img {
-      width: 100%; height: 100%; min-height: 156px; object-fit: cover;
-      opacity: 0.24; mix-blend-mode: screen; filter: saturate(0.8) contrast(1.1);
-    }
-    body.light .dish-media img { opacity: 0.36; mix-blend-mode: multiply; }
-    .dish-media::after {
-      content: ""; position: absolute; inset: 0;
-      background:
-        linear-gradient(180deg, transparent 30%, rgba(13, 13, 13, 0.76)),
-        repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.08) 0 1px, transparent 1px 13px);
+      display: block; width: 100%; height: 100%; min-height: 156px; object-fit: cover;
     }
 
     .dish-badge {
@@ -1065,7 +1057,7 @@
     const state = {
       lang: localStorage.getItem(KEYS.lang) || "fr",
       theme: localStorage.getItem(KEYS.theme) || "dark",
-      activeCategory: "all",
+      activeCategory: "entrees",
       search: "",
       builder: { table: 1, starters: [], mains: [], side: null },
       adminTab: "dashboard",
