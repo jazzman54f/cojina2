@@ -515,6 +515,52 @@
     .map-frame { overflow: hidden; min-height: 460px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); }
     .map-frame iframe { display: block; width: 100%; min-height: 460px; border: 0; filter: saturate(0.88) contrast(0.98); }
 
+    /* SECTION: Rating Modal */
+    .rate-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 10px; border: 1px solid var(--border); border-radius: 999px;
+      background: transparent; color: var(--muted); font-size: 0.8rem; font-weight: 700;
+      transition: border-color 180ms, color 180ms, background 180ms;
+      cursor: pointer;
+    }
+    .rate-btn:hover { border-color: var(--gold); color: var(--gold-2); background: rgba(212,175,55,0.08); }
+
+    .star-picker { display: flex; gap: 6px; justify-content: center; margin: 18px 0 8px; }
+    .star-picker button {
+      background: none; border: none; font-size: 2.2rem; color: var(--border);
+      cursor: pointer; transition: color 150ms, transform 150ms;
+      line-height: 1; padding: 0 2px;
+    }
+  
+.star-picker {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+}
+
+.star-picker button {
+    background: none;
+    border: none;
+    font-size: 2.2rem;
+    cursor: pointer;
+    color: rgba(212,175,55,.25);
+    transition: .2s;
+}
+.star-picker button.lit {
+    color: var(--gold);
+    transform: scale(1.15);
+}
+
+.star-picker button.active {
+    color: var(--gold);
+}
+
+.star-picker button:hover {
+    transform: scale(1.15);
+}
+    .rate-dish-name { font-family: var(--serif); font-size: 1.5rem; text-align: center; margin: 0 0 4px; }
+    .rate-chosen { text-align: center; color: var(--gold-2); font-weight: 900; font-size: 1rem; min-height: 1.4em; margin-bottom: 4px; }
+
     /* SECTION: Reviews — Admin Only */
     .reviews-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 28px; }
     .review-card { padding: 18px; }
@@ -905,6 +951,31 @@
     </div>
   </div>
 
+  <!-- SECTION: Rate Dish Modal -->
+  <div class="modal" id="rate-modal" role="dialog" aria-modal="true" aria-labelledby="rate-modal-title">
+    <div class="modal-dialog">
+      <div class="modal-head">
+        <h2 class="modal-title" id="rate-modal-title">Noter ce plat</h2>
+        <button class="icon-button modal-close" type="button" aria-label="Fermer"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body" style="display:grid;gap:14px;">
+        <p id="rate-dish-name" class="rate-dish-name"></p>
+        <div class="star-picker" id="star-picker">
+          <button type="button" data-star="1" aria-label="1 étoile">★</button>
+          <button type="button" data-star="2" aria-label="2 étoiles">★</button>
+          <button type="button" data-star="3" aria-label="3 étoiles">★</button>
+          <button type="button" data-star="4" aria-label="4 étoiles">★</button>
+          <button type="button" data-star="5" aria-label="5 étoiles">★</button>
+        </div>
+        <div id="rate-chosen" class="rate-chosen"></div>
+        <label class="form-label">Votre prénom<input class="field" id="rate-name" type="text" autocomplete="given-name" maxlength="40"></label>
+        <label class="form-label">Commentaire (optionnel)<textarea class="textarea" id="rate-comment" rows="3" maxlength="300"></textarea></label>
+        <button class="btn primary" id="rate-submit" type="button" style="width:100%;"><i class="fa-solid fa-star"></i> Envoyer mon avis</button>
+        <div id="rate-error" style="color:var(--danger);font-size:0.88rem;min-height:1.2em;"></div>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script>
@@ -1017,7 +1088,9 @@
         adminSaved:"Modification enregistrée.", adminDeleted:"Élément supprimé.", markServed:"Marquer servie",
         dashboard:"Dashboard", dailyAdmin:"Plat du jour", menuAdmin:"Menu Manager",
         reservations:"Réservations", orders:"Commandes", feedbackAdmin:"Avis & Feedback", subscribers:"Abonnés",
-        wrongPassword:"Mot de passe incorrect."
+        wrongPassword:"Mot de passe incorrect.",
+        rateBtn:"Noter", ratePlaceholderName:"Votre prénom", rateSubmit:"Envoyer mon avis", rateThanks:"Merci pour votre avis !", rateErrorStar:"Choisissez une note (1–5 étoiles).", rateErrorName:"Entrez votre prénom.", rateModalTitle:"Noter ce plat",
+        rateLabel1:"Mauvais", rateLabel2:"Bof", rateLabel3:"Bien", rateLabel4:"Très bien", rateLabel5:"Excellent !"
       },
       ar: {
         navAbout:"الدار", navDaily:"طبق اليوم", navMenu:"القائمة", navBuilder:"ركّب طبقك", navReserve:"احجز", navFind:"العنوان",
@@ -1050,7 +1123,9 @@
         adminSaved:"تم حفظ التعديل.", adminDeleted:"تم حذف العنصر.", markServed:"تم التقديم",
         dashboard:"لوحة التحكم", dailyAdmin:"طبق اليوم", menuAdmin:"إدارة القائمة",
         reservations:"الحجوزات", orders:"الطلبات", feedbackAdmin:"الآراء والتقييمات", subscribers:"المشتركون",
-        wrongPassword:"كلمة المرور غير صحيحة."
+        wrongPassword:"كلمة المرور غير صحيحة.",
+        rateBtn:"قيّم", ratePlaceholderName:"اسمك", rateSubmit:"أرسل رأيك", rateThanks:"شكرًا على تقييمك!", rateErrorStar:"اختر تقييمًا (1–5 نجوم).", rateErrorName:"أدخل اسمك.", rateModalTitle:"قيّم هذا الطبق",
+        rateLabel1:"سيئ", rateLabel2:"مقبول", rateLabel3:"جيد", rateLabel4:"جيد جدًا", rateLabel5:"ممتاز!"
       }
     };
 
@@ -1314,14 +1389,14 @@
     function setupStickyTabsVisibility() {
       const menuSection = document.getElementById("menu");
       const stickyBar = document.getElementById("sticky-tabs-bar");
-      const headerH = () => parseInt(getComputedStyle(document.documentElement).getPropertyValue("--header-h")||"74");
-      const obs = new IntersectionObserver(entries => {
-        entries.forEach(e => {
-          // Show sticky bar when menu section scrolled past header
-          stickyBar.classList.toggle("visible", !e.isIntersecting && e.boundingClientRect.top < 0);
-        });
-      }, { threshold: 0, rootMargin: `-${headerH()}px 0px 0px 0px` });
-      obs.observe(menuSection);
+      function update() {
+        const rect = menuSection.getBoundingClientRect();
+        const headerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--header-h")||"74");
+        // Show as soon as the top of the menu section scrolls to/past the header
+        stickyBar.classList.toggle("visible", rect.top <= headerH);
+      }
+      window.addEventListener("scroll", update, { passive: true });
+      update();
     }
 
     // SECTION: Daily Special
@@ -1440,6 +1515,7 @@
               <p class="dish-desc">${highlight(desc,q)}</p>
               <div class="rating-line">
                 <span>${rating ? stars(rating.avg)+` ${rating.avg.toFixed(1)} (${rating.count})` : t("ratingEmpty")}</span>
+                ${!item.soldOut ? `<button class="rate-btn" type="button" data-rate-id="${esc(item.id)}" data-rate-fr="${esc(item.fr)}" data-rate-ar="${esc(item.ar)}"><i class="fa-solid fa-star"></i> ${t("rateBtn")}</button>` : ""}
               </div>
             </div>
           </article>
@@ -1642,7 +1718,11 @@
       document.getElementById("admin-panel").hidden = !logged;
       document.getElementById("admin-logout").hidden = !logged;
       document.getElementById("admin-error").textContent = "";
-      if(!logged) document.getElementById("admin-login-form")?.reset();
+      if(!logged) {
+        document.getElementById("admin-login-form")?.reset();
+        document.getElementById("admin-tabs").innerHTML = "";
+        document.getElementById("admin-content").innerHTML = "";
+      }
     }
 
     async function checkAdminSession() {
@@ -1713,11 +1793,11 @@
         <div class="admin-grid">
           <div class="admin-card"><span>Total plats</span><strong>${menu.length}</strong><small>Menu</small></div>
           <div class="admin-card"><span>Note globale</span><strong>${getAverageRating().toFixed(1)} ★</strong><small>${revs.length} avis</small></div>
-          <div class="admin-card"><span>Plat top noté</span><strong style="font-size:1.1rem;">${top?(state.lang==="ar"?top.dishAr:top.dishFr):"-"}</strong><small>${top?(top.total/top.count).toFixed(1)+" ★":"0"}</small></div>
+          <div class="admin-card" style="cursor:pointer;" onclick="state.adminTab='feedback';renderAdmin();"><span>Plat top noté ↗</span><strong style="font-size:1.1rem;">${top?(state.lang==="ar"?top.dishAr:top.dishFr):"-"}</strong><small>${top?(top.total/top.count).toFixed(1)+" ★":"0"}</small></div>
           <div class="admin-card"><span>Réservations semaine</span><strong>${reservationsThisWeek()}</strong><small>Cette semaine</small></div>
           <div class="admin-card"><span>Abonnés Plat du jour</span><strong>${subs.length}</strong><small>Notifications</small></div>
           <div class="admin-card"><span>Commandes en attente</span><strong>${orders.filter(o=>o.status==="pending").length}</strong><small>Build My Plate</small></div>
-          <div class="admin-card"><span>Total avis</span><strong>${revs.length}</strong><small>Feedback</small></div>
+          <div class="admin-card" style="cursor:pointer;" onclick="state.adminTab='feedback';renderAdmin();"><span>Total avis ↗</span><strong>${revs.length}</strong><small>Voir les avis</small></div>
           <div class="admin-card"><span>Plats épuisés</span><strong>${menu.filter(it=>it.soldOut).length}</strong><small>Sold out</small></div>
         </div>
         <div class="admin-card" style="margin-top:14px;display:flex;gap:18px;align-items:center;flex-wrap:wrap;min-height:auto;">
@@ -1768,6 +1848,13 @@
               <label style="color:var(--muted);font-weight:900;"><input type="checkbox" name="soldOut" ${item.soldOut?"checked":""}> Épuisé</label>
               <textarea class="textarea" name="descFr" placeholder="Description FR">${esc(item.descFr||"")}</textarea>
               <textarea class="textarea" name="descAr" dir="rtl" placeholder="Description AR">${esc(item.descAr||"")}</textarea>
+              <div style="display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap;width:100%;">
+                <img class="dish-img-preview" src="${esc(item.image||"")}" alt="" style="width:72px;height:54px;object-fit:cover;border-radius:6px;border:1px solid var(--border);flex-shrink:0;${item.image?"":"display:none;"}">
+                <label style="flex:1;min-width:160px;color:var(--muted);font-weight:700;font-size:0.86rem;display:flex;flex-direction:column;gap:4px;">
+                  Photo
+                  <input class="field" type="file" name="imageFile" accept="image/*" style="padding:6px;">
+                </label>
+              </div>
               <div style="display:flex;gap:6px;flex-wrap:wrap;">
                 <button class="btn small" type="button" data-admin-save-dish="${item.id}"><i class="fa-solid fa-floppy-disk"></i></button>
                 <button class="btn small danger" type="button" data-admin-delete-dish="${item.id}"><i class="fa-solid fa-trash"></i></button>
@@ -1820,20 +1907,45 @@
     function renderAdminFeedback() {
       const revs = readJSON(KEYS.reviews,[]);
       const avg = revs.length ? (revs.reduce((s,r)=>s+Number(r.rating||0),0)/revs.length).toFixed(1) : "0.0";
+
+      // Per-dish summary
+      const byDish = {};
+      revs.forEach(r => {
+        if (!byDish[r.dishId]) byDish[r.dishId] = { dishFr:r.dishFr, dishAr:r.dishAr, total:0, count:0 };
+        byDish[r.dishId].total += Number(r.rating||0);
+        byDish[r.dishId].count += 1;
+      });
+      const dishRows = Object.values(byDish).sort((a,b)=>(b.total/b.count)-(a.total/a.count));
+
       return `
         <div style="display:flex;align-items:center;gap:18px;margin-bottom:18px;padding:14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface-soft);">
           <strong style="font-family:var(--serif);font-size:2.4rem;color:var(--gold-2);">${avg}</strong>
           <div>${stars(avg)}<br><small style="color:var(--muted);">${revs.length} avis total</small></div>
         </div>
+
+        ${dishRows.length ? `
+        <h3 class="step-title" style="margin:0 0 10px;">Classement des plats</h3>
+        <table class="admin-table" style="margin-bottom:24px;">
+          <thead><tr><th>Plat</th><th>Note moy.</th><th>Avis</th></tr></thead>
+          <tbody>${dishRows.map(d=>`
+            <tr>
+              <td>${esc(state.lang==="ar"?d.dishAr:d.dishFr)}</td>
+              <td>${stars(d.total/d.count)} ${(d.total/d.count).toFixed(1)}</td>
+              <td>${d.count}</td>
+            </tr>
+          `).join("")}</tbody>
+        </table>` : ""}
+
+        <h3 class="step-title" style="margin:0 0 10px;">Tous les avis</h3>
         <div class="feedback-preview">
           ${revs.map(r=>`
             <div class="feedback-card">
               <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
                 <strong>${esc(r.name)}</strong>${stars(r.rating)}
               </div>
-              <p>${esc(r.comment)}</p>
+              ${r.comment ? `<p>${esc(r.comment)}</p>` : ""}
               <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.82rem;color:var(--muted);">
-                <span>${esc(state.lang==="ar"?r.dishAr:r.dishFr)}</span>
+                <span style="font-weight:700;color:var(--gold-2);">${esc(state.lang==="ar"?r.dishAr:r.dishFr)}</span>
                 <div style="display:flex;gap:6px;align-items:center;">
                   <span>${relativeDate(r.createdAt)}</span>
                   <button class="btn small danger" data-delete-review="${r.id}"><i class="fa-solid fa-trash"></i></button>
@@ -1928,6 +2040,41 @@
           saveItem();
         }
       });
+
+      // Live image preview for all file inputs in admin content
+      document.getElementById("admin-content")?.addEventListener("change", e => {
+        const input = e.target;
+        if(input.type !== "file" || input.name !== "imageFile" || !input.files?.length) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+          // find nearest preview img (in dish row) or daily form preview
+          const row = input.closest("[data-admin-dish]");
+          if(row) {
+            let preview = row.querySelector(".dish-img-preview");
+            if(!preview) {
+              preview = document.createElement("img");
+              preview.className = "dish-img-preview";
+              preview.style.cssText = "width:72px;height:54px;object-fit:cover;border-radius:6px;border:1px solid var(--border);flex-shrink:0;";
+              input.closest("div").prepend(preview);
+            }
+            preview.src = ev.target.result;
+            preview.style.display = "";
+          }
+          // daily form
+          const dailyForm = input.closest("#admin-daily-form");
+          if(dailyForm) {
+            let preview = dailyForm.querySelector(".dish-img-preview");
+            if(!preview) {
+              preview = document.createElement("img");
+              preview.className = "dish-img-preview";
+              preview.style.cssText = "width:120px;height:80px;object-fit:cover;border-radius:6px;border:1px solid var(--border);margin-top:4px;display:block;";
+              input.parentElement.after(preview);
+            }
+            preview.src = ev.target.result;
+          }
+        };
+        reader.readAsDataURL(input.files[0]);
+      });
     }
 
     function renderQRCode() {
@@ -1947,7 +2094,21 @@
       item.soldOut = row.querySelector('[name="soldOut"]').checked;
       item.descFr = row.querySelector('[name="descFr"]')?.value.trim() || makeDescription(item,"fr");
       item.descAr = row.querySelector('[name="descAr"]')?.value.trim() || makeDescription(item,"ar");
-      writeJSON(KEYS.menu, menu); renderMenu(); renderBuilder(); showToast(t("adminSaved"));
+
+      const fileInput = row.querySelector('[name="imageFile"]');
+      const doSave = () => {
+        writeJSON(KEYS.menu, menu);
+        renderMenu(); renderBuilder(); showToast(t("adminSaved"));
+        const preview = row.querySelector('.dish-img-preview');
+        if(preview && item.image) { preview.src = item.image; preview.style.display = ""; }
+      };
+      if(fileInput?.files?.length) {
+        const reader = new FileReader();
+        reader.onload = () => { item.image = reader.result; doSave(); };
+        reader.readAsDataURL(fileInput.files[0]);
+      } else {
+        doSave();
+      }
     }
 
     function deleteById(key, id) { writeJSON(key, readJSON(key,[]).filter(it=>it.id!==id)); }
@@ -2094,6 +2255,8 @@
           setAdminView(false);
           state.adminTab = "dashboard";
           document.getElementById("admin-content").innerHTML = "";
+          document.getElementById("admin-tabs").innerHTML = "";
+          closeModal(document.getElementById("admin-modal"));
         }
       });
 
@@ -2125,6 +2288,80 @@
       window.addEventListener("resize", () => { updateTabIndicator(); });
     }
 
+    // SECTION: Rating Modal
+    const rateState = { dishId: null, dishFr: null, dishAr: null, stars: 0 };
+    const starLabels = { fr: ["","Mauvais","Bof","Bien","Très bien","Excellent !"], ar: ["","سيئ","مقبول","جيد","جيد جدًا","ممتاز!"] };
+
+    function openRateModal(dishId, dishFr, dishAr) {
+      rateState.dishId = dishId;
+      rateState.dishFr = dishFr;
+      rateState.dishAr = dishAr;
+      rateState.stars = 0;
+      document.getElementById("rate-dish-name").textContent = state.lang === "ar" ? dishAr : dishFr;
+      document.getElementById("rate-modal-title").textContent = t("rateModalTitle");
+      document.getElementById("rate-name").value = "";
+      document.getElementById("rate-comment").value = "";
+      document.getElementById("rate-error").textContent = "";
+      document.getElementById("rate-chosen").textContent = "";
+      updateStarPicker(0);
+      openModal(document.getElementById("rate-modal"));
+    }
+
+    function updateStarPicker(val) {
+      document.querySelectorAll("#star-picker button").forEach(btn => {
+        btn.classList.toggle("lit", Number(btn.dataset.star) <= val);
+      });
+      document.getElementById("rate-chosen").textContent = val ? (starLabels[state.lang]?.[val] || "") : "";
+    }
+
+    function setupRatingModal() {
+      document.getElementById("star-picker").addEventListener("click", e => {
+        const btn = e.target.closest("[data-star]");
+        if (!btn) return;
+        rateState.stars = Number(btn.dataset.star);
+        updateStarPicker(rateState.stars);
+      });
+
+      document.getElementById("star-picker").addEventListener("mouseover", e => {
+        const btn = e.target.closest("[data-star]");
+        if (btn) updateStarPicker(Number(btn.dataset.star));
+      });
+      document.getElementById("star-picker").addEventListener("mouseleave", () => {
+        updateStarPicker(rateState.stars);
+      });
+
+      document.getElementById("rate-submit").addEventListener("click", () => {
+        const err = document.getElementById("rate-error");
+        if (!rateState.stars) { err.textContent = t("rateErrorStar"); return; }
+        const name = document.getElementById("rate-name").value.trim();
+        if (!name) { err.textContent = t("rateErrorName"); return; }
+        err.textContent = "";
+        const review = {
+          id: crypto.randomUUID(),
+          dishId: rateState.dishId,
+          dishFr: rateState.dishFr,
+          dishAr: rateState.dishAr,
+          name,
+          rating: rateState.stars,
+          comment: document.getElementById("rate-comment").value.trim(),
+          createdAt: Date.now()
+        };
+        const revs = readJSON(KEYS.reviews, []);
+        revs.unshift(review);
+        writeJSON(KEYS.reviews, revs);
+        closeModal(document.getElementById("rate-modal"));
+        showToast(t("rateThanks"));
+        renderMenu(); // refresh star display on card
+      });
+
+      // Open modal on rate button click (delegated on menu grid)
+      document.getElementById("menu-grid").addEventListener("click", e => {
+        const btn = e.target.closest("[data-rate-id]");
+        if (!btn) return;
+        openRateModal(btn.dataset.rateId, btn.dataset.rateFr, btn.dataset.rateAr);
+      });
+    }
+
     // SECTION: Boot
     document.addEventListener("DOMContentLoaded", async () => {
       await loadStore();
@@ -2145,6 +2382,7 @@
       setupObservers();
       setupParallax();
       setupStickyTabsVisibility();
+      setupRatingModal();
       checkAdminSession();
     });
   </script>
